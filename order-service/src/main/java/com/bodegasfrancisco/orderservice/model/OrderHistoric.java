@@ -2,9 +2,7 @@ package com.bodegasfrancisco.orderservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 
 @Entity
-@Table(name = "order_historics")
+@Table(name = "order_historic")
 public class OrderHistoric {
 
     @Id
