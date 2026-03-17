@@ -62,29 +62,11 @@ public interface PsqlExceptionHandler {
         return null;
     }
 
-    private @NonNull String buildMessage(String base, String constraint, String detail) {
-        StringBuilder sb = new StringBuilder(base);
-
-        if (constraint != null && !constraint.isBlank()) {
-            sb.append(" [").append(constraint).append("]");
-        }
-
-        if (detail != null && !detail.isBlank()) {
-            sb.append(". ").append(detail);
-        }
-
-        return sb.toString();
-    }
-
     private @NonNull ResponseEntity<ApiErrorResponse> handlePostgresIntegrity(
         @NonNull PSQLException ex,
         @NonNull HttpServletRequest request
     ) {
         String sqlState = ex.getSQLState();
-        //ServerErrorMessage server = ex.getServerErrorMessage();
-
-        //String constraint = server != null ? server.getConstraint() : null;
-        //String detail = server != null ? server.getDetail() : null;
 
         var builder = ApiErrorResponse.builder()
             .path(request.getRequestURI());
