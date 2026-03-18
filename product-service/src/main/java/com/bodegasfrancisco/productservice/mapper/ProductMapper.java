@@ -2,7 +2,6 @@ package com.bodegasfrancisco.productservice.mapper;
 
 import com.bodegasfrancisco.productservice.dto.*;
 import com.bodegasfrancisco.productservice.model.Product;
-import com.bodegasfrancisco.productservice.model.ProductCategory;
 import org.mapstruct.*;
 
 @Mapper(
