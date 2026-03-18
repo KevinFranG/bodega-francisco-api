@@ -1,11 +1,13 @@
 package com.bodegasfrancisco.productservice.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -16,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreateProductDTO {
 
-    @NotNull(message = "product requires name")
+    @NotBlank(message = "product requires a not blank name")
     private String name;
 
     private String description;
@@ -27,4 +29,7 @@ public class CreateProductDTO {
 
     @NotNull(message = "product requires category")
     private UUID categoryId;
+
+    @URL(protocol = "https", message = "product's image may be a valid URL")
+    private String imageUrl;
 }

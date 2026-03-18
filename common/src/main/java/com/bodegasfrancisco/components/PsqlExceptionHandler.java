@@ -20,7 +20,7 @@ public interface PsqlExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.CONFLICT)
             .body(ApiErrorResponse.builder()
-                      .reason("DUPLICATE_KEY")
+                      .reason("duplicated_key")
                       .message("A record with the same unique value already exists")
                       .status(HttpStatus.CONFLICT.value())
                       .path(request.getRequestURI())

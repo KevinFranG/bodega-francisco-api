@@ -1,17 +1,21 @@
 package com.bodegasfrancisco.data;
 
+import com.bodegasfrancisco.exception.BadRequestException;
+import com.bodegasfrancisco.exception.ErrorCodes;
 import lombok.NonNull;
-import org.apache.coyote.BadRequestException;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.ListCrudRepository;
 
 import java.util.List;
 
 public interface IndexService<T, ID> {
-    JpaRepository<T, ID> getRepository();
+    ListCrudRepository<T, ID> getRepository();
 
-    default T find(@NonNull ID id) throws BadRequestException {
+    default T index(@NonNull ID id) throws BadRequestException {
         return getRepository().findById(id)
-            .orElseThrow(() -> new BadRequestException("entity not exists"));
+            .orElseThrow(() -> new BadRequestException(
+                ErrorCodes.ENTITY_NOT_FOUND,
+                "entity not exists")
+            );
     }
 
     default List<T> index() {

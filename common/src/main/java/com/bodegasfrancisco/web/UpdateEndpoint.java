@@ -1,20 +1,14 @@
 package com.bodegasfrancisco.web;
 
-import com.bodegasfrancisco.data.UpdateService;
+import com.bodegasfrancisco.exception.BadRequestException;
 import com.bodegasfrancisco.web.response.ApiResponse;
 import jakarta.validation.Valid;
-import org.apache.coyote.BadRequestException;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-public interface UpdateEndpoint<T, UpdateDTO> {
-    UpdateService<T, UpdateDTO> getService();
+public interface UpdateEndpoint<UpdateResonse, UpdateDTO> {
 
     @PutMapping
-    default ApiResponse<T> update(@Valid @RequestBody UpdateDTO dto) throws BadRequestException {
-        return ApiResponse.<T>builder()
-            .data(getService().update(dto))
-            .message("entity updated")
-            .build();
-    }
+    ApiResponse<UpdateResonse> update(@Valid @RequestBody UpdateDTO dto)
+        throws BadRequestException;
 }

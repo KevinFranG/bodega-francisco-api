@@ -1,19 +1,15 @@
 package com.bodegasfrancisco.web;
 
-import com.bodegasfrancisco.data.CreateService;
 import com.bodegasfrancisco.web.response.ApiResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public interface CreateEndpoint<T, CreateDTO> {
-    CreateService<T, CreateDTO> getService();
+public interface CreateEndpoint<CreateResponse, CreateDTO> {
 
     @PostMapping
-    default ApiResponse<T> create(@Valid @RequestBody CreateDTO dto) {
-        return ApiResponse.<T>builder()
-            .message("Entity created")
-            .data(getService().create(dto))
-            .build();
-    }
+    @ResponseStatus(HttpStatus.CREATED)
+    ApiResponse<CreateResponse> create(@Valid @RequestBody CreateDTO dto);
 }

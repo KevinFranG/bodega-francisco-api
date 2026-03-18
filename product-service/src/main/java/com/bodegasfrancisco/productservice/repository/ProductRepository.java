@@ -19,4 +19,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     @NullMarked
     @Query("select p from Product p where p.id = :id and p.isActive = true")
     Optional<Product> findById(UUID id);
+
+    @Query(value = "select nextval('product_sku_seq')", nativeQuery = true)
+    Long getNextSkuId();
 }
