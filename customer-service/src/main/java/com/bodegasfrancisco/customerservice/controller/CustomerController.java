@@ -35,12 +35,13 @@ public class CustomerController implements
 
     @Override
     public ApiResponse<ResponseCustomerDTO> create(CreateCustomerDTO dto) {
-        var customer = service.create(dto);
+        return null;
+        /*var customer = service.create(dto);
 
         return ApiResponse.<ResponseCustomerDTO>builder()
             .data(mapper.toResponse(customer))
             .message("customer created")
-            .build();
+            .build();*/
     }
 
     @Override

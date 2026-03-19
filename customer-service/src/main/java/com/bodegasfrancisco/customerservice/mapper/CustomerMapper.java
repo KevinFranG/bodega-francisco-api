@@ -5,6 +5,7 @@ import com.bodegasfrancisco.customerservice.model.CartItem;
 import com.bodegasfrancisco.customerservice.model.Customer;
 import com.bodegasfrancisco.customerservice.model.CustomerAddress;
 import com.bodegasfrancisco.customerservice.model.CustomerCard;
+import com.bodegasfrancisco.kafka.events.CustomerCreationRequestedEvent;
 import org.bson.types.ObjectId;
 import org.mapstruct.*;
 
@@ -16,6 +17,7 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.*;
 public interface CustomerMapper {
 
     Customer toObject(CreateCustomerDTO dto);
+    Customer toObject(CustomerCreationRequestedEvent dto);
 
     ResponseCustomerDTO toResponse(Customer customer);
 

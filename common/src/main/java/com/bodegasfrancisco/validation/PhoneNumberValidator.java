@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, String> {
 
-    private static final String PHONE_NUMBER_REGEX = "^\\\\+[1-9]\\\\d{1,14}$";
+    private static final String PHONE_NUMBER_REGEX = "^\\+[1-9]\\d{1,14}$";
 
 
     @Override

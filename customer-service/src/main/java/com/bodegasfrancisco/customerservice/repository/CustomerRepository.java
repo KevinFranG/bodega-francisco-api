@@ -18,4 +18,6 @@ public interface CustomerRepository extends MongoRepository<Customer, ObjectId> 
     @NullMarked
     @Query("{ '_id': ?0, 'status': 'ACTIVE' }")
     Optional<Customer> findById(ObjectId id);
+
+    Optional<Customer> findByEmail(String email);
 }

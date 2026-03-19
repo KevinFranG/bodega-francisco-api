@@ -1,77 +1,168 @@
 services:
-    postgres-products:
-      image: postgres:16
-      container_name: postgres-products
-      environment:
-        POSTGRES_DB: bodegasf_products
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-      ports:
-        - "5433:5432"
-      volumes:
-        - postgres_products_data:/var/lib/postgresql/data
-      healthcheck:
-        test: [ "CMD-SHELL", "pg_isready -U postgres -d bodegasf_products" ]
-        interval: 5s
-        timeout: 5s
-        retries: 10
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - microservices-net
 
-    postgres-orders:
-      image: postgres:16
-      container_name: postgres-orders
-      environment:
-        POSTGRES_DB: bodegasf_orders
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-      ports:
-        - "5434:5432"
-      volumes:
-        - postgres_orders_data:/var/lib/postgresql/data
-      healthcheck:
-        test: [ "CMD-SHELL", "pg_isready -U postgres -d bodegasf_orders" ]
-        interval: 5s
-        timeout: 5s
-        retries: 10
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
-    product-service:
-      build:
-        context: ./product-service
-        dockerfile: Dockerfile
-      container_name: product-service
-      depends_on:
-        - postgres-products
-      environment:
-        DB_URL: jdbc:postgresql://postgres-products:5432/bodegasf_products
-        DB_USER: postgres
-        DB_PSWD: postgres
-      ports:
-        - "8081:8080"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
 
-    order-service:
-      build:
-        context: ./order-service
-        dockerfile: Dockerfile
-      container_name: order-service
-      depends_on:
-        - postgres-orders
-      environment:
-        DB_URL: jdbc:postgresql://postgres-orders:5432/bodegasf_orders
-        DB_USER: postgres
-        DB_PSWD: postgres
-      ports:
-        - "8082:8080"
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - microservices-net
 
-    api-gateway:
-      build:
-        context: ./api-gateway
-        dockerfile: Dockerfile
-      container_name: gateway
-      depends_on:
-        - product-service
-        - order-service
-      ports:
-        - "8080:8080"
+  mongo-auth:
+    image: mongo:7
+    container_name: mongo-auth
+    ports:
+      - "37017:27017"
+    volumes:
+      - mongo_auth_data:/data/db
+    networks:
+      - microservices-net
+
+  mongo-customer:
+    image: mongo:7
+    container_name: mongo-customer
+    ports:
+      - "37018:27017"
+    volumes:
+      - mongo_customer_data:/data/db
+    networks:
+      - microservices-net
+
+  postgres-products:
+    image: postgres:16
+    container_name: postgres-products
+    environment:
+      POSTGRES_DB: bodegasf_products
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_products_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d bodegasf_products" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres-orders:
+    image: postgres:16
+    container_name: postgres-orders
+    environment:
+      POSTGRES_DB: bodegasf_orders
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_orders_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d bodegasf_orders" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    depends_on:
+      - mongo-auth
+      - kafka
+    environment:
+      MONGO_URI: mongodb://mongo-auth:27017/bodegasf_auth
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    ports:
+      - "8081:8080"
+    networks:
+      - microservices-net
+
+  customer-service:
+    build:
+      context: ./customer-service
+      dockerfile: Dockerfile
+    container_name: customer-service
+    depends_on:
+      - mongo-customer
+      - kafka
+    environment:
+      MONGO_URI: mongodb://mongo-customer:27017/bodegasf_customers
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    ports:
+      - "8082:8080"
+    networks:
+      - microservices-net
+
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    depends_on:
+      - postgres-products
+    environment:
+      DB_URL: jdbc:postgresql://postgres-products:5432/bodegasf_products
+      DB_USER: postgres
+      DB_PSWD: postgres
+    ports:
+      - "8083:8080"
+
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    depends_on:
+      - postgres-orders
+    environment:
+      DB_URL: jdbc:postgresql://postgres-orders:5432/bodegasf_orders
+      DB_USER: postgres
+      DB_PSWD: postgres
+    ports:
+      - "8084:8080"
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    depends_on:
+      - product-service
+      - order-service
+    ports:
+      - "8080:8080"
 
 volumes:
+  mongo_auth_data:
+  mongo_customer_data:
   postgres_products_data:
   postgres_orders_data:
+
+networks:
+  microservices-net:
+    driver: bridge

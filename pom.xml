@@ -18,10 +18,12 @@
 
     <modules>
         <module>common</module>
+        <module>event-contracts</module>
         <module>api-gateway</module>
+        <module>customer-service</module>
+        <module>auth-service</module>
         <module>product-service</module>
         <module>order-service</module>
-        <module>customer-service</module>
     </modules>
 
 </project>
