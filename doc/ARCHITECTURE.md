@@ -1,43 +1,45 @@
-# Bodegas Francisco Api
+# Bodegas Francisco API - Architecture
 
-Online store that distributes and offers products to customers in different regions.
+Online store platform for distributing and selling products to customers across multiple regions.
 
-## Index
+---
 
-- [System Overview](#1-system-overview)
-- [System Actors](#2-system-actors)
-- [Main Use Cases](#3-main-use-cases)
-- [Domain Boundaries](#4-domain-boundaries)
-- [Microservices Architecture](#5-microservices-architecture)
-- [Event Drive Architecture](#6-event-drive-architecture)
-- [System Lifecycle](#7-system-lifecycle)
-- [Data Architecture](#8-data-architecture)
-- [Security Architecture](#9-security-architecture)
-- [Observability & Monitoring](#10-observability--monitoring)
-- [Deployment Architecture](#11-deployment-architecture)
-- [Architecture Decisions & Trade-offs](#12-architecture-decisions--trade-offs)
+## Table of Contents
+
+1. [System Overview](#1-system-overview)
+2. [System Actors](#2-system-actors)
+3. [Main Use Cases](#3-main-use-cases)
+4. [Domain Boundaries](#4-domain-boundaries)
+5. [Microservices Architecture](#5-microservices-architecture)
+6. [Event-Driven Architecture](#6-event-driven-architecture)
+7. [System Lifecycle](#7-system-lifecycle)
+8. [Data Architecture](#8-data-architecture)
+9. [Security Architecture](#9-security-architecture)
+10. [Observability and Monitoring](#10-observability-and-monitoring)
+11. [Deployment Architecture](#11-deployment-architecture)
+12. [Architecture Decisions and Trade-offs](#12-architecture-decisions-and-trade-offs)
 
 ---
 
 ## 1. System Overview
 
-Bodegas Francisco Commerce Platform SA. de CV.
+**Bodegas Francisco Commerce Platform S.A. de C.V.**
 
-### Problematic
+### Problem Statement
 
 Bodegas Francisco is a regional distribution business that requires a scalable digital platform to manage product sales,
 inventory, customer orders, credit purchases, and warehouse logistics across multiple regions.
 
-### Goals:
+### Goals
 
 - Allow customers to browse and purchase products online
-- Manage customers credits and loans
+- Manage customer credit and loans
 - Manage inventory across warehouses
 - Process orders and payments reliably
 - Provide analytics and business insights
 - Support asynchronous integrations between services
 
-### Non functional goals:
+### Non-Functional Goals
 
 - Scalability
 - High availability
@@ -54,7 +56,7 @@ inventory, customer orders, credit purchases, and warehouse logistics across mul
 
 A user who purchases products through the online platform.
 
-### Warehouse worker
+### Warehouse Worker
 
 Responsible for preparing and shipping customer orders.
 
@@ -62,18 +64,18 @@ Responsible for preparing and shipping customer orders.
 
 Manages products, categories, and system configurations.
 
-### Data analyst
+### Data Analyst
 
 Accesses analytics and reports to understand sales performance and business metrics.
 
 ---
 
-## 3. Main use cases
+## 3. Main Use Cases
 
 ### Customer
 
-- Register and login
-- Browse product catalog
+- Register and log in
+- Browse the product catalog
 - View product details
 - Add products to cart
 - Place an order
@@ -81,12 +83,12 @@ Accesses analytics and reports to understand sales performance and business metr
 - View order history
 - Request credit purchases
 
-### Warehouse worker
+### Warehouse Worker
 
 - View pending orders
 - Prepare products for shipment
 - Update shipment status
-- Check products stock
+- Check product stock
 
 ### Administrator
 
@@ -97,63 +99,63 @@ Accesses analytics and reports to understand sales performance and business metr
 - Create and update discounts
 - Manage debtors
 
-### Data analyst
+### Data Analyst
 
 - View sales statistics
 - Analyze top-selling products
-- Analyze customers behavior
+- Analyze customer behavior
 
 ---
 
 ## 4. Domain Boundaries
 
-### Identity & access
+### Identity and Access
 
 - User authentication
 - Token generation
 - Role-based authorization
 - Session management
 
-### User domain
+### User Domain
 
 - User profiles
 - Addresses
 - Customer information
 
-### Product catalog domain
+### Product Catalog Domain
 
 - Product information
 - Categories
-- Product description
+- Product descriptions
 - Product search
 
-### Inventory domain
+### Inventory Domain
 
 - Product stock levels
 - Inventory reservations
 - Stock movements
 - Warehouse visibility
 
-### Order domain
+### Order Domain
 
 - Order creation
 - Order lifecycle
 - Order history
 - Order cancellation
 
-### Payment domain
+### Payment Domain
 
-- Payment request
+- Payment requests
 - Payment confirmation
 - Payment failures
 
-### Notification domain
+### Notification Domain
 
 - Email notifications
 - WebSocket notifications
 - System alerts
 
-### Analytic domain
+### Analytics Domain
 
 - Sales metrics
 - Product performance
@@ -166,65 +168,64 @@ Accesses analytics and reports to understand sales performance and business metr
 
 ### API Gateway
 
-The API Gateway is the single entry point for all client requests.
-It handles routing, authentication validation, rate limiting and request forwarding to the appropriate microservices.
+The API Gateway is the single entry point for all client requests. It handles routing, authentication validation, rate
+limiting, and request forwarding to the appropriate microservices.
 
-Responsibilities:
+**Responsibilities**
 
 - Request routing
 - JWT validation
 - Rate limiting
 - API aggregation
 
-### Auth service
+### Auth Service
 
-Responsible for user authentication and authorization.
-It manages login, token generation, and session validation.
+Responsible for user authentication and authorization. It manages login, token generation, and session validation.
 
-Responsibilities:
+**Responsibilities**
 
 - User login
 - Token generation
 - Token validation
 - OAuth integration
 
-Technologies:
+**Technologies**
 
 - JWT
 - OAuth2
 - Keycloak
 
-### User service
+### User Service
 
 Manages user profiles and customer information.
 
-Responsibilities:
+**Responsibilities**
 
 - User profiles
 - Addresses
 - Customer preferences
 - User purchases
 
-### Product catalog service
+### Product Catalog Service
 
 Responsible for managing product data and categories.
 
-Responsibilities:
+**Responsibilities**
 
 - Product creation
 - Product updates
 - Product listing
 - Product search
 
-Technologies:
+**Technologies**
 
-- Elasticsearch (product query)
+- Elasticsearch for product queries
 
-### Inventory service
+### Inventory Service
 
 Handles stock levels and product availability.
 
-Responsibilities:
+**Responsibilities**
 
 - Track product stock
 - Reserve inventory
@@ -234,7 +235,7 @@ Responsibilities:
 
 Manages customer orders and the order lifecycle.
 
-Responsibilities:
+**Responsibilities**
 
 - Create orders
 - Cancel orders
@@ -245,7 +246,7 @@ Responsibilities:
 
 Processes payment requests and payment confirmations.
 
-Responsibilities:
+**Responsibilities**
 
 - Process payments
 - Handle payment failures
@@ -255,7 +256,7 @@ Responsibilities:
 
 Responsible for sending notifications to users.
 
-Types:
+**Types**
 
 - Email notifications
 - WebSocket notifications
@@ -265,7 +266,7 @@ Types:
 
 Processes business events and generates metrics and reports.
 
-Responsibilities:
+**Responsibilities**
 
 - Sales analytics
 - Product performance metrics
@@ -275,90 +276,104 @@ Responsibilities:
 
 The system uses a hybrid communication model.
 
-Synchronous communication:
+**Synchronous communication**
 
 - REST APIs
 - GraphQL queries
 
-Asynchronous communication:
+**Asynchronous communication**
 
 - Event-driven messaging using Apache Kafka
 
 ---
 
-## 6. Event-drive Architecture
+## 6. Event-Driven Architecture
 
-The platform uses an event-driven architecture to allow services to communicate asynchronously.
-This approach improves scalability, resilience and decoupling between services.
+The platform uses an event-driven architecture to allow services to communicate asynchronously. This approach improves
+scalability, resilience, and decoupling between services.
 
 Events are published to a message broker and consumed by interested services.
 
 ### Event Broker
 
-The system uses Apache Kafka as the event streaming platform.
-Kafka allows services to publish and consume events without tight coupling.
+The system uses Apache Kafka as the event streaming platform. Kafka allows services to publish and consume events
+without tight coupling.
 
 ### Order Creation Flow
 
 1. Customer places an order
 2. Order Service creates the order
-3. Order Service publishes an OrderCreated event
+3. Order Service publishes an `OrderCreated` event
 4. Multiple services consume the event
 
-Services at stake:
+**Services involved**
 
-1. Inventory Service → reserves stock
-2. Payment Service → processes payment
-3. Notification Service → notifies the user
-4. Analytics Service → records the sale
+1. Inventory Service reserves stock
+2. Payment Service processes payment
+3. Notification Service notifies the user
+4. Analytics Service records the sale
 
-### Core system events
+### Core System Events
 
-| Event             | Consumers                                                                   |
-|-------------------|-----------------------------------------------------------------------------|
-| UserRegistered    | Notification Service, Analytics Service                                     |
-| ProductCreated    | Product Service, Analytics Service, Search Index                            |
-| ProductUpdated    | Product Service, Search Index                                               |
-| ProductOutOfStock | Notification Service, Analytics Service                                     |
-| CartCheckedOut    | Order Service                                                               |
-| OrderConfirmed    | Notification Service, Analytics Service                                     |
-| OrderCreated      | Inventory Service, Payment Service, Notification Service, Analytics Service |
-| OrderCancelled    | Inventory Service, Notification Service, Analytics Service                  |
-| OrderCompleted    | Notification Service, Analytics Service                                     |
-| PaymentRequested  | Payment Service                                                             |
-| PaymentCompleted  | Order Service, Notification Service, Analytics Service                      |
-| PaymentFailed     | Order Service, Notification Service, Analytics Service                      |
-| InventoryReserved | Order Service                                                               |
-| InventoryReleased | Order Service                                                               |
-| OrderShipped      | Notification Service, Analytics Service                                     |
-| OrderDelivered    | Notification Service, Analytics Service                                     |
-| CartCreated       | User Service                                                                |
-| CartItemAdded     | User Service                                                                |
-| CartItemRemoved   | User Service                                                                |
+| Event               | Consumers                                                                   |
+|---------------------|-----------------------------------------------------------------------------|
+| `UserRegistered`    | Notification Service, Analytics Service                                     |
+| `ProductCreated`    | Product Service, Analytics Service, Search Index                            |
+| `ProductUpdated`    | Product Service, Search Index                                               |
+| `ProductOutOfStock` | Notification Service, Analytics Service                                     |
+| `CartCheckedOut`    | Order Service                                                               |
+| `OrderConfirmed`    | Notification Service, Analytics Service                                     |
+| `OrderCreated`      | Inventory Service, Payment Service, Notification Service, Analytics Service |
+| `OrderCancelled`    | Inventory Service, Notification Service, Analytics Service                  |
+| `OrderCompleted`    | Notification Service, Analytics Service                                     |
+| `PaymentRequested`  | Payment Service                                                             |
+| `PaymentCompleted`  | Order Service, Notification Service, Analytics Service                      |
+| `PaymentFailed`     | Order Service, Notification Service, Analytics Service                      |
+| `InventoryReserved` | Order Service                                                               |
+| `InventoryReleased` | Order Service                                                               |
+| `OrderShipped`      | Notification Service, Analytics Service                                     |
+| `OrderDelivered`    | Notification Service, Analytics Service                                     |
+| `CartCreated`       | User Service                                                                |
+| `CartItemAdded`     | User Service                                                                |
+| `CartItemRemoved`   | User Service                                                                |
 
-### Example event payload
+### Example Event Payload
 
-Order created
-...
+`OrderCreated`
+
+```json
+{
+  "orderId": "12345",
+  "customerId": "67890",
+  "items": [
+    {
+      "productId": "ABC-001",
+      "quantity": 2
+    }
+  ],
+  "total": 950.00,
+  "createdAt": "2026-03-27T12:00:00Z"
+}
+```
 
 ---
 
 ## 7. System Lifecycle
 
-### Order states
+### Order States
 
-| State           | Description                                                        |
-|-----------------|--------------------------------------------------------------------|
-| CREATED         | The order has been created but payment has not yet been processed. |
-| PENDING_PAYMENT | The payment request has been initiated.                            |
-| PAID            | Payment was successful.                                            |
-| PROCESSING      | Warehouse is preparing the order.                                  |
-| SHIPPED         | The order has been sent to the customer.                           |
-| DELIVERED       | The order has reached the customer.                                |
-| CANCELLED       | The order was cancelled by the user or system.                     |
-| FAILED          | The order failed due to payment or inventory issues.               |
+| State             | Description                                                        |
+|-------------------|--------------------------------------------------------------------|
+| `CREATED`         | The order has been created but payment has not yet been processed. |
+| `PENDING_PAYMENT` | The payment request has been initiated.                            |
+| `PAID`            | Payment was successful.                                            |
+| `PROCESSING`      | The warehouse is preparing the order.                              |
+| `SHIPPED`         | The order has been sent to the customer.                           |
+| `DELIVERED`       | The order has reached the customer.                                |
+| `CANCELLED`       | The order was cancelled by the user or system.                     |
+| `FAILED`          | The order failed due to payment or inventory issues.               |
 
-### Flow
+### Main Flow
 
 ```text
 Customer places order
@@ -388,9 +403,10 @@ OrderShipped
 OrderDelivered
 ```
 
-### Failure scenarios
+### Failure Scenarios
 
-Payment Failure:
+**Payment failure**
+
 ```text
 PaymentFailed
         │
@@ -401,7 +417,8 @@ OrderCancelled
 InventoryReleased
 ```
 
-Inventory Failure
+**Inventory failure**
+
 ```text
 InventoryUnavailable
         │
@@ -409,147 +426,144 @@ InventoryUnavailable
 OrderCancelled
 ```
 
-### Saga pattern
+### Saga Pattern
 
-The order workflow is implemented using the Saga Pattern to maintain data consistency across multiple services.
-Each service performs a local transaction and publishes an event that triggers the next step in the workflow.
+The order workflow is implemented using the Saga Pattern to maintain data consistency across multiple services. Each
+service performs a local transaction and publishes an event that triggers the next step in the workflow.
 
-#### Compensating transactions
+#### Compensating Transactions
 
 If any step fails, compensating actions are triggered to revert previous operations.
 
-| Step              | Action            | Compensation     |
-|-------------------|-------------------|------------------|
-| Create Order      | OrderCreated      | CancelOrder      |
-| Reserve Inventory | InventoryReserved | ReleaseInventory |
-| Process Payment   | PaymentCompleted  | RefundPayment    |
+| Step              | Action              | Compensation       |
+|-------------------|---------------------|--------------------|
+| Create Order      | `OrderCreated`      | `CancelOrder`      |
+| Reserve Inventory | `InventoryReserved` | `ReleaseInventory` |
+| Process Payment   | `PaymentCompleted`  | `RefundPayment`    |
 
-There are two approaches to implementing the Saga Pattern:
+There are two main approaches to implementing the Saga Pattern:
 
-1. Orchestration
-   A central service coordinates the workflow.
+1. **Orchestration**: a central service coordinates the workflow.
+2. **Choreography**: each service reacts to events and triggers the next step.
 
-2. Choreography
-   Each service reacts to events and triggers the next step.
-
-This platform uses a choreography-based saga approach using event streaming using Kafka.
+This platform uses a choreography-based saga approach built on Kafka event streaming.
 
 ---
 
 ## 8. Data Architecture
 
-Each microservice owns its data and manages its own database.
-Services must not access another service's database directly.
+Each microservice owns its data and manages its own database. Services must not access another service's database
+directly.
 
 Data is shared across services through APIs or events.
 
-### Auth service
+### Auth Service
 
-Database: PostgreSQL
+**Database:** PostgreSQL
 
-Data:
+**Data**
 
-- user credentials
-- tokens
-- roles.
+- User credentials
+- Tokens
+- Roles
 
-### User service
+### User Service
 
-Database: MongoDB
+**Database:** MongoDB
 
-Data:
+**Data**
 
-- UserProfiles
+- User profiles
 - Addresses
-- CustomerPreferences
+- Customer preferences
 
-### Product catalog service
+### Product Catalog Service
 
-Database: PostgreSQL
+**Database:** PostgreSQL
 
-Data:
+**Data**
 
 - Products
 - Categories
-- ProductImages
+- Product images
 
-### Inventory service
+### Inventory Service
 
-Database: PostgreSQL
+**Database:** PostgreSQL
 
-Data:
+**Data**
 
 - Inventory
-- StockMovements
+- Stock movements
 - Reservations
 
-### Order service
+### Order Service
 
-Database: PostgreSQL
+**Database:** PostgreSQL
 
-Data:
+**Data**
 
 - Orders
-- OrderItems
-- OrderStatusHistory
+- Order items
+- Order status history
 
-### Payment service
+### Payment Service
 
-Database: PostgreSQL
+**Database:** PostgreSQL
 
-Data:
+**Data**
 
 - Payments
-- PaymentTransactions
-- PaymentStatus
+- Payment transactions
+- Payment status
 
-### Notification service
+### Notification Service
 
-Database: MongoDB
+**Database:** MongoDB
 
-Data:
-
-- Notifications
-- NotificationTemplates
-- DeliveryStatus
-
-### Analytic service
-
-Database: MongoDB
-
-Data:
+**Data**
 
 - Notifications
-- NotificationTemplates
-- DeliveryStatus
+- Notification templates
+- Delivery status
 
-### Catching layer
+### Analytics Service
 
-Redis - Cache Aside Pattern
+**Database:** MongoDB
 
-Product catalog cache
-Session storage
-Rate limiting
-Frequently accessed queries
+**Data**
 
-### Search engine
+- Sales metrics
+- Product performance data
+- Customer behavior insights
+
+### Caching Layer
+
+**Redis - Cache Aside Pattern**
+
+- Product catalog cache
+- Session storage
+- Rate limiting
+- Frequently accessed queries
+
+### Search Engine
 
 Product data is indexed into Elasticsearch to enable fast full-text search and filtering.
 
-Example:
+**Examples**
 
-- search by name
-- search by category
-- search by tags
+- Search by name
+- Search by category
+- Search by tags
 
-### Data synchronization
+### Data Synchronization
 
 Data synchronization between services is handled through domain events.
 
-Example:
+**Examples**
 
-- ProductCreated → indexed in Elasticsearch
-- OrderCompleted → sent to Analytics Service
+- `ProductCreated` → indexed in Elasticsearch
+- `OrderCompleted` → sent to Analytics Service
 
 ---
 
@@ -558,7 +572,7 @@ Example:
 The platform implements a layered security architecture to protect user data, system integrity, and service
 communication.
 
-Security is enforced at multiple levels including authentication, authorization, API gateway protection, and secure
+Security is enforced at multiple levels, including authentication, authorization, API Gateway protection, and secure
 communication between services.
 
 ### Authentication
@@ -567,7 +581,7 @@ Authentication is handled by the Auth Service using JWT-based authentication.
 
 Users authenticate with their credentials and receive an access token that is used for subsequent requests.
 
-Flow:
+**Flow**
 
 ```text
 User login
@@ -584,21 +598,20 @@ Client sends token with requests
 
 ### Authorization
 
-Model: Role-Based Access Control (RBAC)
+**Model:** Role-Based Access Control (RBAC)
 
-System roles:
+**System roles**
 
-- ADMIN
-- CUSTOMER
-- WAREHOUSE_WORKER
-- DATA_ANALYST
+- `ADMIN`
+- `CUSTOMER`
+- `WAREHOUSE_WORKER`
+- `DATA_ANALYST`
 
-### JWT tokens
+### JWT Tokens
 
-JWT tokens are used for stateless authentication across the system.
-Tokens contain user identity and roles.
+JWT tokens are used for stateless authentication across the system. Tokens contain user identity and roles.
 
-Payload:
+**Payload**
 
 ```json
 {
@@ -610,32 +623,32 @@ Payload:
 }
 ```
 
-### API Gateway security
+### API Gateway Security
 
-Spring cloud gateway protects API resources ensuring data secure, invalidating d2
-attacks and adding secure filters.
+Spring Cloud Gateway protects API resources by validating requests, applying security filters, and helping mitigate
+abuse scenarios.
 
-Rate limit: 100 requests per minute per user (Using redis to manage containers).
+**Rate limit:** 100 requests per minute per user, using Redis.
 
-Internal service communication can use secure network channels within the cluster using Kubernetes.
+Internal service communication can use secure network channels within the cluster, for example in Kubernetes.
 
-Sensitive configuration such as database credentials and API keys are stored securely using
-environment variables or secret management systems.
+Sensitive configuration such as database credentials and API keys should be stored using environment variables or secret
+management systems.
 
 ---
 
-## 10. Observability & Monitoring
+## 10. Observability and Monitoring
 
 Observability is critical in distributed systems to understand system behavior, detect failures, and analyze
 performance.
+
 The platform implements a monitoring stack that includes metrics collection, logging, and distributed tracing.
 
-### Metrics collection
+### Metrics Collection
 
-Prometheus collects metrics from all microservices.
-Grafana provides dashboards to visualize system performance.
+Prometheus collects metrics from all microservices. Grafana provides dashboards to visualize system performance.
 
-Metrics:
+**Metrics**
 
 - API response time
 - Request rate
@@ -646,9 +659,8 @@ Metrics:
 ### Logging
 
 Each microservice generates structured logs to capture important system events and errors.
-Logs help developers debug issues and track system behavior.
 
-Types:
+**Types**
 
 - Application logs
 - Error logs
@@ -657,48 +669,51 @@ Types:
 
 ### OpenTelemetry
 
-Distributed tracing allows tracking a request as it flows across multiple services.
-Each service adds tracing information to help visualize the entire request lifecycle.
+Distributed tracing allows tracking a request as it flows across multiple services. Each service adds tracing
+information to help visualize the full request lifecycle.
 
-### Health checks
+### Health Checks
 
+```text
 /actuator/health
+```
+
+---
 
 ## 11. Deployment Architecture
 
-The platform is deployed using containerized microservices to ensure scalability, portability and isolation between
+The platform is deployed using containerized microservices to ensure scalability, portability, and isolation between
 services.
 
-Containerization enables consistent environments across development, testing and production.
+Containerization enables consistent environments across development, testing, and production.
 
-### Containerization: Docker
+### Containerization with Docker
 
 Each microservice is packaged as a Docker container.
-Containers include the application code, dependencies, and runtime environment.
 
-Examples:
+**Examples**
 
-- api-gateway
-- auth-service
-- user-service
-- product-service
-- inventory-service
-- order-service
-- payment-service
-- notification-service
-- analytics-service
+- API Gateway
+- Auth Service
+- User Service
+- Product Service
+- Inventory Service
+- Order Service
+- Payment Service
+- Notification Service
+- Analytics Service
 
 ### Local Development Environment
 
 Local development uses Docker Compose to orchestrate all services and supporting infrastructure.
 
-### CI/DC Pipeline: GitHub Actions
+### CI/CD Pipeline with GitHub Actions
 
 ```text
 Developer pushes code
         │
         ▼
-CI Pipeline
+CI pipeline
         │
         ├── Run tests
         ├── Build application
@@ -708,37 +723,37 @@ CI Pipeline
 
 ### Container Orchestration
 
-Kubernetes orchestrates containers and manages service deployment, scaling and fault recovery.
+Kubernetes orchestrates containers and manages deployment, scaling, and fault recovery.
 
-Responsibilities:
+**Responsibilities**
 
 - Service discovery
 - Load balancing
-- Auto scaling
+- Auto-scaling
 - Self-healing
 - Rolling updates
 
 ### Infrastructure Components
 
-|Component|Technology|
-|API Gateway|Spring Cloud Gateway|
-|Message Broker|Apache Kafka|
-|Databases|PostgreSQL, MongoDB|
-|Cache|Redis|
-|Search|Elasticsearch|
-|Monitoring|Prometheus + Grafana|
+| Component      | Technology           |
+|----------------|----------------------|
+| API Gateway    | Spring Cloud Gateway |
+| Message Broker | Apache Kafka         |
+| Databases      | PostgreSQL, MongoDB  |
+| Cache          | Redis                |
+| Search         | Elasticsearch        |
+| Monitoring     | Prometheus + Grafana |
 
 ---
 
-## 12. Architecture Decisions & Trade-offs
+## 12. Architecture Decisions and Trade-offs
 
-### Microservices vs Monolith
+### Microservices vs. Monolith
 
-The system is designed using a microservices architecture instead of a monolithic architecture.
-Microservices allow independent development, deployment and scaling of services.
-They also enable clear domain boundaries.
+The system is designed using a microservices architecture instead of a monolithic architecture. Microservices allow
+independent development, deployment, and scaling of services while enabling clear domain boundaries.
 
-Trade-offs:
+**Trade-offs**
 
 - Increased system complexity
 - Operational overhead
@@ -746,31 +761,29 @@ Trade-offs:
 
 ### Event-Driven Architecture
 
-The system uses an event-driven architecture for inter-service communication.
-Event-driven communication improves scalability and decoupling between services.
-Services can react to events independently.
+The system uses an event-driven architecture for inter-service communication. This improves scalability and decoupling
+by allowing services to react independently to events.
 
-Trade-offs:
+**Trade-offs**
 
 - Eventual consistency
 - Harder debugging
-- More complex system observability
+- More complex observability
 
 ### Saga Pattern
 
-Ensures consistency across distributed transactions without using a global transaction manager.
+The Saga Pattern ensures consistency across distributed transactions without using a global transaction manager.
 
-Trade-offs:
+**Trade-offs**
 
 - More complex workflow logic
-- Compensating transactions required
+- Compensating transactions are required
 
 ### Containerization
 
-Containers provide environment consistency and easier deployment.
-Kubernetes enables scaling and fault tolerance.
+Containers provide environment consistency and easier deployment. Kubernetes enables scaling and fault tolerance.
 
-Trade-offs:
+**Trade-offs**
 
 - Infrastructure complexity
 - Operational overhead
