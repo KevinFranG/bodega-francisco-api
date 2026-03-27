@@ -5,13 +5,22 @@ import com.bodegasfrancisco.authservice.model.Role;
 import com.bodegasfrancisco.authservice.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import org.jspecify.annotations.NonNull;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,14 +29,19 @@ import java.util.stream.Collectors;
 public class JwtService {
 
     private final JwtConfig.Properties properties;
-    private final SecretKey secretKey;
+
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
 
     public JwtService(JwtConfig.Properties properties) {
         this.properties = properties;
 
-        this.secretKey = Keys.hmacShaKeyFor(
-            properties.secret().getBytes(StandardCharsets.UTF_8)
-        );
+        try {
+            this.privateKey = readPrivateKey(properties.privateKey());
+            this.publicKey = readPublicKey(properties.publicKey());
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not load RSA keys", e);
+        }
     }
 
 
@@ -38,8 +52,8 @@ public class JwtService {
         Set<String> roles = user.getRoles()
             .stream()
             .map(Role::getName)
+            .map(role -> "ROLE_" + role)
             .collect(Collectors.toSet());
-        roles.add(user.getType().name());
 
         return Jwts.builder()
             .subject(user.getId())
@@ -47,7 +61,7 @@ public class JwtService {
             .claim("roles", roles)
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiration))
-            .signWith(secretKey)
+            .signWith(privateKey, Jwts.SIG.RS256)
             .compact();
     }
 
@@ -60,13 +74,13 @@ public class JwtService {
             .claim("type", "refresh")
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiration))
-            .signWith(secretKey)
+            .signWith(privateKey, Jwts.SIG.RS256)
             .compact();
     }
 
     public Claims extractClaims(@NonNull String token) {
         return Jwts.parser()
-            .verifyWith(secretKey)
+            .verifyWith(publicKey)
             .build()
             .parseSignedClaims(token)
             .getPayload();
@@ -88,5 +102,38 @@ public class JwtService {
 
     public long expirationTime() {
         return properties.refreshExpiration();
+    }
+
+
+    private PrivateKey readPrivateKey(@NonNull Resource resource)
+        throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+
+        String key;
+        try (var input = resource.getInputStream()) {
+            key = new String(input.readAllBytes(), StandardCharsets.UTF_8)
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+        }
+
+        byte[] decode = Base64.getDecoder().decode(key);
+        var spec = new PKCS8EncodedKeySpec(decode);
+        return KeyFactory.getInstance("RSA").generatePrivate(spec);
+    }
+
+    private PublicKey readPublicKey(@NonNull Resource resource)
+        throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+
+        String key;
+        try (var input = resource.getInputStream()) {
+            key = new String(input.readAllBytes(), StandardCharsets.UTF_8)
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
+        }
+
+        byte[] decode = Base64.getDecoder().decode(key);
+        var spec = new X509EncodedKeySpec(decode);
+        return KeyFactory.getInstance("RSA").generatePublic(spec);
     }
 }

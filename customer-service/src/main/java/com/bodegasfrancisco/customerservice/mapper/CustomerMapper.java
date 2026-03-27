@@ -6,7 +6,6 @@ import com.bodegasfrancisco.customerservice.model.Customer;
 import com.bodegasfrancisco.customerservice.model.CustomerAddress;
 import com.bodegasfrancisco.customerservice.model.CustomerCard;
 import com.bodegasfrancisco.kafka.events.CustomerCreationRequestedEvent;
-import org.bson.types.ObjectId;
 import org.mapstruct.*;
 
 import static org.mapstruct.NullValuePropertyMappingStrategy.*;
@@ -16,7 +15,6 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.*;
     unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CustomerMapper {
 
-    Customer toObject(CreateCustomerDTO dto);
     Customer toObject(CustomerCreationRequestedEvent dto);
 
     ResponseCustomerDTO toResponse(Customer customer);
@@ -50,14 +48,4 @@ public interface CustomerMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = IGNORE)
     void merge(@MappingTarget CartItem cartItem, UpdateCartItemDTO dto);
-
-
-
-    default ObjectId map(String id) {
-        return id == null ? null : new ObjectId(id);
-    }
-
-    default String map(ObjectId id) {
-        return id == null ? null : id.toString();
-    }
 }

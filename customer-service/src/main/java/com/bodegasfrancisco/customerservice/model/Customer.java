@@ -22,7 +22,7 @@ import java.util.List;
 public class Customer {
 
     @Id
-    private ObjectId id;
+    private String id;
 
     @Field
     private String name;

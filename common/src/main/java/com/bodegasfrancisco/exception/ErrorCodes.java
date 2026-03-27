@@ -9,6 +9,8 @@ public enum ErrorCodes {
     ENTITY_NOT_FOUND("entity not found"),
     USER_NOT_FOUND("user not registered"),
     USER_ALREADY_EXISTS("user email already exists"),
+    USER_NOT_ACTIVATED("user not activated"),
+    USER_DELETED("user is deleted"),
     INVALID_CREDENTIALS("invalid credentials"),
     INVALID_HASH_OPERATION("can not complete hash operation");
 

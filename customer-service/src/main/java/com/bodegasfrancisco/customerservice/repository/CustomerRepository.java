@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface CustomerRepository extends MongoRepository<Customer, ObjectId> {
+public interface CustomerRepository extends MongoRepository<Customer, String> {
 
     @NullMarked
     @Query("{ 'status': 'ACTIVE' }")
@@ -17,7 +17,8 @@ public interface CustomerRepository extends MongoRepository<Customer, ObjectId> 
 
     @NullMarked
     @Query("{ '_id': ?0, 'status': 'ACTIVE' }")
-    Optional<Customer> findById(ObjectId id);
+    Optional<Customer> findById(String id);
 
+    @Query("{ 'email': ?0, 'status': 'ACTIVE' }")
     Optional<Customer> findByEmail(String email);
 }

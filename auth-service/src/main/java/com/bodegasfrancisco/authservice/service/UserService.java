@@ -16,6 +16,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Getter
 @RequiredArgsConstructor
 
@@ -60,5 +62,18 @@ public class UserService implements
             user.getRoles().add(new Role(user.getType().name(), null));
 
         return repository.save(user);
+    }
+
+    @Override
+    public List<User> index() {
+        return repository.findAllByStatus(User.Status.ACTIVE);
+    }
+
+    @Override
+    public User index(@NonNull String id) throws BadRequestException {
+        return repository.findByIdAndStatus(id, User.Status.ACTIVE)
+            .orElseThrow(() -> new BadRequestException(
+                ErrorCodes.USER_NOT_FOUND,
+                "user with id " + id + " not exists, was deleted or is not activated"));
     }
 }

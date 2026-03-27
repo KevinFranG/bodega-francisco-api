@@ -1,7 +1,10 @@
 package com.bodegasfrancisco.authservice.components;
 
+import com.bodegasfrancisco.authservice.model.User;
 import com.bodegasfrancisco.authservice.repository.UserRepository;
 import com.bodegasfrancisco.authservice.service.JwtService;
+import com.bodegasfrancisco.exception.ErrorCodes;
+import com.bodegasfrancisco.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +19,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -40,9 +45,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         var token = authHeader.replace("Bearer ", "");
         String userId;
+        List<String> roles;
 
         try {
             userId = jwtService.extractSubject(token);
+            var claim = jwtService.extractClaims(token).get("roles");
+
+            if (claim instanceof List<?> list)
+                roles = list.stream()
+                    .map(Object::toString)
+                    .toList();
+            else roles = new ArrayList<>();
         } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
@@ -56,12 +69,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         userRepository.findById(userId).ifPresent(user -> {
             System.out.println("user found " + user.getUsername());
 
+            if (user.getStatus() == User.Status.PENDING)
+                throw new UnauthorizedException(
+                    ErrorCodes.USER_NOT_ACTIVATED,
+                    "user " + user.getUserId() + " is not activated");
+            if (user.getStatus() == User.Status.DELETED)
+                throw new UnauthorizedException(
+                    ErrorCodes.USER_DELETED,
+                    "user " + user.getUserId() + " is deleted");
+            
             if (!jwtService.isTokenValid(token, user))
                 return;
 
-            var authorities = user.getRoles()
+            var authorities = roles
                 .stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .map(SimpleGrantedAuthority::new)
                 .toList();
 
             var authenticationToken =
